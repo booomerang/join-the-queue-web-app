@@ -13,6 +13,7 @@ import { getFingerprint, getFingerprintData } from '@thumbmarkjs/thumbmarkjs'
 //     },
 // });
 
+const BASE_URL = 'http://jtqapp.local:8082';
 
 const form = ref({
     tg_username: 'tg_username',
@@ -38,6 +39,12 @@ const submit = () => {
     });
 };
 
+async function getIpData () {
+    const response = await fetch(BASE_URL + '/webapp/user/ip')
+
+    form.value.ip_addresses = await response.json();
+}
+
 getFingerprint().then(function(fp) {
     console.log(fp);
     form.fingerprint = fp;
@@ -48,15 +55,26 @@ getFingerprintData().then((data) => {
     form.fingerprint_data = JSON.stringify(data);
 })
 
-const webApp = window.Telegram.WebApp;
-console.log(webApp.initData);
+function initTelegramWepApp() {
+    Telegram.WebApp.ready();
+
+    const webApp = window.Telegram.WebApp;
+    console.log(webApp.initData);
+
+    form.value.tg_username = webApp.initDataUnsafe.user.username
+    form.value.tg_first_name = webApp.initDataUnsafe.user.first_name
+    form.value.tg_last_name = webApp.initDataUnsafe.user.last_name
+}
+
+initTelegramWepApp();
+getIpData();
 
 </script>
 
 <template>
-
         <form @submit.prevent="submit">
             <div>
+                <p>{{ form.ip_addresses }}</p>
                 <InputLabel for="email" value="Email" />
 
                 <TextInput
