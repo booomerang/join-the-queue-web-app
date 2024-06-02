@@ -40,9 +40,16 @@ const submit = () => {
 };
 
 async function getIpData () {
+    try {
     const response = await fetch(BASE_URL + '/webapp/user/ip')
 
-    form.value.ip_addresses = await response.json();
+    let result = await response.json();
+
+    console.log("Success:", result);
+    form.value.ip_addresses = result
+    } catch (error) {
+        console.error("Error:", error);
+    }
 }
 
 getFingerprint().then(function(fp) {
@@ -61,12 +68,12 @@ function initTelegramWepApp() {
     const webApp = window.Telegram.WebApp;
     console.log(webApp.initData);
 
-    form.value.tg_username = webApp.initDataUnsafe.user.username
-    form.value.tg_first_name = webApp.initDataUnsafe.user.first_name
-    form.value.tg_last_name = webApp.initDataUnsafe.user.last_name
+    // form.value.tg_username = webApp.initDataUnsafe.user.username
+    // form.value.tg_first_name = webApp.initDataUnsafe.user.first_name
+    // form.value.tg_last_name = webApp.initDataUnsafe.user.last_name
 }
 
-initTelegramWepApp();
+//initTelegramWepApp();
 getIpData();
 
 </script>
