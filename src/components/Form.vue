@@ -22,7 +22,7 @@ const form = ref({
     ip_addresses: [],
     errors: {}
 });
-const tgWebapp = ref(null)
+const tgWebapp = ref({})
 
 const submit = () => {
     axios.post(BASE_API_URL + '/form', form)
@@ -57,7 +57,8 @@ function initTelegramWepApp() {
     Telegram.WebApp.ready();
 
     const webApp = window.Telegram.WebApp;
-    tgWebapp.value = webApp.initDataUnsafe
+    console.log(webApp)
+    tgWebapp.value = webApp.initData
 
     // form.value.tg_username = webApp.initDataUnsafe.user.username
     // form.value.tg_first_name = webApp.initDataUnsafe.user.first_name
