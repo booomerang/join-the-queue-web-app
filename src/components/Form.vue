@@ -4,16 +4,10 @@ import InputError from './InputError.vue';
 import PrimaryButton from './PrimaryButton.vue';
 import TextInput from './TextInput.vue';
 import { ref, watch } from 'vue'
-
+import axios from 'axios'
 import { getFingerprint, getFingerprintData } from '@thumbmarkjs/thumbmarkjs'
 
-// const props = defineProps({
-//     ipAddresses: {
-//         type: Array,
-//     },
-// });
-
-const BASE_URL = 'http://jtqapp.local:8082';
+const BASE_API_URL = import.meta.env.VITE_BASE_API_URL;
 
 const form = ref({
     tg_username: 'tg_username',
@@ -28,9 +22,10 @@ const form = ref({
     ip_addresses: [],
     errors: {}
 });
+const tgWebapp = ref(null)
 
 const submit = () => {
-    axios.post('/form', form)
+    axios.post(BASE_API_URL + '/form', form)
     .then(function (response) {
         console.log(response);
     })
@@ -40,16 +35,12 @@ const submit = () => {
 };
 
 async function getIpData () {
-    try {
-    const response = await fetch(BASE_URL + '/webapp/user/ip')
-
-    let result = await response.json();
-
-    console.log("Success:", result);
-    form.value.ip_addresses = result
-    } catch (error) {
-        console.error("Error:", error);
-    }
+    axios.get(BASE_API_URL + '/webapp/user/ip')
+    .then(function (response) {
+        form.value.ip_addresses = response.data
+    }).catch(function (error) {
+        console.log(error);
+    });
 }
 
 getFingerprint().then(function(fp) {
@@ -66,17 +57,15 @@ function initTelegramWepApp() {
     Telegram.WebApp.ready();
 
     const webApp = window.Telegram.WebApp;
-    console.log(webApp.initData);
-    console.log('===');
-    console.log(webApp.initDataUnsafe);
+    tgWebapp.value = webApp.initDataUnsafe
 
     // form.value.tg_username = webApp.initDataUnsafe.user.username
     // form.value.tg_first_name = webApp.initDataUnsafe.user.first_name
     // form.value.tg_last_name = webApp.initDataUnsafe.user.last_name
 }
 
-//initTelegramWepApp();
-//getIpData();
+initTelegramWepApp();
+getIpData();
 
 </script>
 
@@ -84,6 +73,7 @@ function initTelegramWepApp() {
         <form @submit.prevent="submit">
             <div>
                 <p>{{ form.ip_addresses }}</p>
+                <div>{{ tgWebapp }}</div>
                 <InputLabel for="email" value="Email" />
 
                 <TextInput

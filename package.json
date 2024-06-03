@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@thumbmarkjs/thumbmarkjs": "^0.14.8",
+    "axios": "^1.7.2",
     "vue": "^3.4.21"
   },
   "devDependencies": {
