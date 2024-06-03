@@ -67,6 +67,8 @@ function initTelegramWepApp() {
 
     const webApp = window.Telegram.WebApp;
     console.log(webApp.initData);
+    console.log('===');
+    console.log(webApp.initDataUnsafe);
 
     // form.value.tg_username = webApp.initDataUnsafe.user.username
     // form.value.tg_first_name = webApp.initDataUnsafe.user.first_name
@@ -74,7 +76,7 @@ function initTelegramWepApp() {
 }
 
 //initTelegramWepApp();
-getIpData();
+//getIpData();
 
 </script>
 
