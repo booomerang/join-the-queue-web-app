@@ -58,7 +58,7 @@ function initTelegramWepApp() {
 
     const webApp = window.Telegram.WebApp;
     console.log(webApp)
-    tgWebapp.value = webApp.initData
+    tgWebapp.value = webApp.initDataUnsafe
 
     // form.value.tg_username = webApp.initDataUnsafe.user.username
     // form.value.tg_first_name = webApp.initDataUnsafe.user.first_name
