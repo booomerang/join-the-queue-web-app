@@ -9,6 +9,8 @@ import { getFingerprint, getFingerprintData } from '@thumbmarkjs/thumbmarkjs'
 
 const BASE_API_URL = import.meta.env.VITE_BASE_API_URL;
 
+const formSubmitted = ref(false)
+const submitError = ref('')
 const form = ref({
     tg_username: 'tg_username',
     tg_first_name: 'tg_first_name',
@@ -19,39 +21,32 @@ const form = ref({
     whom_send: 'prize_for_me',
     fingerprint: '',
     fingerprint_data: '',
-    ip_addresses: [],
+    ip_address: '',
     errors: {}
 });
 const tgWebapp = ref({})
 
 const submit = () => {
-    axios.post(BASE_API_URL + '/form', form)
+    axios.post(BASE_API_URL + '/api/webapp/form', form.value, {headers: {
+    }})
     .then(function (response) {
         console.log(response);
+        formSubmitted.value = true;
     })
     .catch(function (error) {
         console.log(error);
     });
 };
 
-async function getIpData () {
-    axios.get(BASE_API_URL + '/webapp/user/ip')
+function getIpData () {
+    axios.get(BASE_API_URL + '/api/webapp/user/ip')
     .then(function (response) {
-        form.value.ip_addresses = response.data
+        form.value.ip_address = response.data.ip
     }).catch(function (error) {
         console.log(error);
+        submitError.value = error
     });
 }
-
-getFingerprint().then(function(fp) {
-    console.log(fp);
-    form.fingerprint = fp;
-});
-
-getFingerprintData().then((data) => {
-    console.log(data);
-    form.fingerprint_data = JSON.stringify(data);
-})
 
 function initTelegramWepApp() {
     Telegram.WebApp.ready();
@@ -60,10 +55,20 @@ function initTelegramWepApp() {
     console.log(webApp)
     tgWebapp.value = webApp.initDataUnsafe
 
-    // form.value.tg_username = webApp.initDataUnsafe.user.username
-    // form.value.tg_first_name = webApp.initDataUnsafe.user.first_name
-    // form.value.tg_last_name = webApp.initDataUnsafe.user.last_name
+    form.value.tg_username = webApp.initDataUnsafe?.user?.username || ''
+    form.value.tg_first_name = webApp.initDataUnsafe?.user?.first_name || ''
+    form.value.tg_last_name = webApp.initDataUnsafe?.user?.last_name || ''
 }
+
+getFingerprint().then(function(fp) {
+    console.log(fp);
+    form.value.fingerprint = fp;
+});
+
+getFingerprintData().then((data) => {
+    console.log(data);
+    form.value.fingerprint_data = JSON.stringify(data);
+})
 
 initTelegramWepApp();
 getIpData();
@@ -71,10 +76,19 @@ getIpData();
 </script>
 
 <template>
-        <form @submit.prevent="submit">
+        <div v-if="formSubmitted">
+            <p>Вы успешно добавлены в очередь!</p>
+        </div>
+        <div v-else-if="submitError.length">
+            <InputError class="mt-2" :message="submitError" />
+        </div>
+        <form v-else @submit.prevent="submit">
             <div>
-                <p>{{ form.ip_addresses }}</p>
-                <div>{{ tgWebapp }}</div>
+                <p>Ваш IP: {{ form.ip_address }}</p>
+                <div>
+                    <span>Ваши данные из Телеграмм:</span>
+                    <p>{{ tgWebapp }}</p>
+                </div>
                 <InputLabel for="email" value="Email" />
 
                 <TextInput
@@ -91,7 +105,7 @@ getIpData();
             </div>
 
             <div class="mt-4">
-                <InputLabel for="slotname" value="Slotname" />
+                <InputLabel for="slotname" value="Рекомендуемый слот" />
 
                 <TextInput
                     id="slotname"
@@ -106,7 +120,7 @@ getIpData();
             </div>
 
             <div class="mt-4">
-                <InputLabel for="name_in_chat" value="Name in chat" />
+                <InputLabel for="name_in_chat" value="Ваше имя в чате на платформе где вы сотрите стрим" />
 
                 <TextInput
                     id="name_in_chat"
@@ -121,13 +135,16 @@ getIpData();
             </div>
 
             <div class="block mt-4">
-                    <b class="block font-medium text-sm text-gray-700">Who send prize</b>
+                    <b class="block font-medium text-sm text-gray-700">Кому отправить выигрыш?</b>
 
-                    <input type="radio" id="one" value="prize_for_me" v-model="form.whom_send">
-                    <label for="one">Me</label>
-                    <br>
-                    <input type="radio" id="two" value="prize_for_romba" v-model="form.whom_send">
-                    <label for="two">Romba decides</label>
+                    <div class="mt-2">
+                        <input type="radio" id="one" value="prize_for_me" v-model="form.whom_send">
+                        <label for="one">Мне</label>
+                    </div>
+                    <div class="mt-2">
+                        <input class="mt-2" type="radio" id="two" value="prize_for_romba" v-model="form.whom_send">
+                        <label for="two">Ромба решает</label>
+                    </div>
             </div>
 
             <div class="flex items-center justify-end mt-4">
