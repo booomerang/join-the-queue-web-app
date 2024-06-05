@@ -35,7 +35,14 @@ const submit = () => {
     })
     .catch(function (error) {
         console.log(error);
-        submitError.value = error
+        try {
+            const data = JSON.parse(error.response); // Try to parse the response as JSON
+            submitError.value = data.message || data
+        } catch(err) {
+            // The response wasn't a JSON object
+            // Do your text handling here
+            submitError.value = error
+        }
     });
 };
 
@@ -80,7 +87,7 @@ getIpData();
         <div v-if="formSubmitted">
             <p>Вы успешно добавлены в очередь!</p>
         </div>
-        <div v-else-if="submitError.length">
+        <div v-else-if="submitError">
             <InputError class="mt-2" :message="submitError" />
         </div>
         <form v-else @submit.prevent="submit">
