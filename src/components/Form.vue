@@ -35,6 +35,7 @@ const submit = () => {
     })
     .catch(function (error) {
         console.log(error);
+        submitError.value = error
     });
 };
 
