@@ -27,22 +27,22 @@ const form = ref({
 const tgWebapp = ref({})
 
 const submit = () => {
-    axios.post(BASE_API_URL + '/api/webapp/form', form.value, {headers: {
-    }})
+    axios.post(BASE_API_URL + '/api/webapp/form', form.value)
     .then(function (response) {
         console.log(response);
         formSubmitted.value = true;
     })
     .catch(function (error) {
         console.log(error);
-        try {
-            const data = JSON.parse(error.response); // Try to parse the response as JSON
-            submitError.value = data.message || data
-        } catch(err) {
-            // The response wasn't a JSON object
-            // Do your text handling here
-            submitError.value = error
-        }
+        submitError.value = error.toJSON()
+        // try {
+        //     const data = JSON.parse(error.response); // Try to parse the response as JSON
+        //     submitError.value = data.message || data
+        // } catch(err) {
+        //     // The response wasn't a JSON object
+        //     // Do your text handling here
+        //     submitError.value = error.toJson()
+        // }
     });
 };
 
