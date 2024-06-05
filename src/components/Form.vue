@@ -12,9 +12,9 @@ const BASE_API_URL = import.meta.env.VITE_BASE_API_URL;
 const formSubmitted = ref(false)
 const submitError = ref('')
 const form = ref({
-    tg_username: 'tg_username',
-    tg_first_name: 'tg_first_name',
-    tg_last_name: 'tg_last_name',
+    tg_username: '',
+    tg_first_name: '',
+    tg_last_name: '',
     email: '',
     slotname: '',
     name_in_chat: '',
@@ -149,7 +149,7 @@ getIpData();
 
             <div class="flex items-center justify-end mt-4">
                 <PrimaryButton class="ms-4" :class="{ 'opacity-25': form.processing }" :disabled="form.processing">
-                    Join the Queue
+                    Записаться в очередь
                 </PrimaryButton>
             </div>
         </form>
